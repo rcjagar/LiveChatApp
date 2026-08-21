@@ -93,9 +93,11 @@ const PORT = 8000;
 // Use the exact same capitalization everywhere.
 const httpServer = http.createServer(app);
 
-httpServer.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}/`);
-});
+// Do not bind a port when Jest imports the application for request testing.
+if (process.env.NODE_ENV !== 'test') {
+    httpServer.listen(PORT, () => {
+        console.log(`Server is running at http://localhost:${PORT}/`);
+    });
+}
 
-// The test imports this exact name.
-export { httpServer };
+export { app, httpServer };

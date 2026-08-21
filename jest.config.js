@@ -22,6 +22,12 @@ export default {
     */
     testMatch: ['**/tests/**/*.test.js'],
 
+    // Include every backend source file in the coverage report.
+    collectCoverageFrom: ['src/**/*.js'],
+
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text', 'lcov', 'html'],
+
     /*
      Display the name of each test while running.
     */
