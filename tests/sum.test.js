@@ -6,22 +6,13 @@ import request from 'supertest';
 /*
  Import the running HTTP server from our application.
 */
-import { httpServer } from '../src/server';
+import { app } from '../src/server.js';
 
 describe('Sum demo tests', () => {
-    /*
-     Run after all tests have completed.
-
-     Closing the server allows Jest to exit properly.
-    */
-    afterAll((done) => {
-        httpServer.close(done);
-    });
-
     describe('GET /sum', () => {
         it('should return the sum of two valid numbers', async () => {
             // Send GET /sum?a=5&b=3 and wait for the response.
-            const response = await request(httpServer)
+            const response = await request(app)
                 .get('/sum?a=5&b=3')
                 .timeout(4000);
 
@@ -36,7 +27,7 @@ describe('Sum demo tests', () => {
 
         it('should return an error if "a" or "b" is not a number', async () => {
             // Send an invalid value for "a".
-            const response = await request(httpServer)
+            const response = await request(app)
                 .get('/sum?a=invalid&b=3')
                 .timeout(4000);
 
@@ -52,7 +43,7 @@ describe('Sum demo tests', () => {
 
         it('should return an error if "a" or "b" is missing', async () => {
             // Send only "a"; query parameter "b" is missing.
-            const response = await request(httpServer)
+            const response = await request(app)
                 .get('/sum?a=5')
                 .timeout(4000);
 
