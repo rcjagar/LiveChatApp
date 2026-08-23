@@ -4,6 +4,10 @@ A small Node.js HTTP API built with Express and native ES modules. The current
 project provides health/welcome, addition, and string-concatenation endpoints,
 with integration tests powered by Jest and Supertest.
 
+This is a learning project for practicing backend architecture one layer at a
+time. The code favors small, readable examples and detailed comments so that
+the purpose of each part is easy to follow.
+
 > **Project status:** despite the repository name, real-time chat and WebSocket
 > features have not been implemented yet. This repository currently contains
 > the tested HTTP API foundation.
@@ -12,6 +16,7 @@ with integration tests powered by Jest and Supertest.
 
 - Express 5 HTTP server
 - Request logging with Morgan
+- In-memory user and chat-message data services
 - Native ECMAScript modules (`import` / `export`)
 - Endpoint integration tests with Jest and Supertest
 - Text, LCOV, and browsable HTML coverage reports
@@ -75,6 +80,31 @@ curl "http://localhost:8000/concat?str1=Hello&str2=World"
 
 Invalid or missing query parameters for `/sum` and `/concat` return a `400 Bad
 Request` response with a JSON error message.
+
+## Data layer
+
+`src/Data_Layer/dataServices.js` is a simple learning-focused data layer. It
+keeps data in memory instead of connecting to a database:
+
+- `store.users` is a `Map` keyed by username.
+- `store.messages` is an array of chat-message objects.
+- `userService.createUser()` rejects duplicate usernames and stores a password
+  that has already been hashed by the caller.
+- `userService.getUser()` finds a user by username.
+- `messageService.addMessage()` creates a message with a unique UUID.
+- `messageService.getMessages()` returns the stored messages.
+- `messageService.deleteMessage()` removes a message by ID and reports whether
+  it was found.
+
+The methods are asynchronous even though the current operations happen in
+memory. This keeps the service interface ready for a future database, whose
+operations will be asynchronous.
+
+> The store is intentionally temporary: all users and messages are erased when
+> the Node.js process restarts. It is appropriate for learning and tests, but
+> not for production persistence. Passwords must be hashed before they reach
+> this layer, and a service result containing a password hash must never be sent
+> to a client.
 
 ## Available scripts
 
@@ -160,16 +190,18 @@ cleanup.
 
 ```text
 .
-├── src/
-│   └── server.js          # Express application, routes, and HTTP server
-├── tests/
-│   ├── app.test.js        # Root and not-found route tests
-│   ├── concat.test.js     # Concatenation endpoint tests
-│   └── sum.test.js        # Addition endpoint tests
-├── jest.config.js         # Test discovery and coverage configuration
-├── package.json           # Scripts and dependency ranges
-├── package-lock.json      # Exact dependency tree
-└── .gitignore             # Files excluded from version control
++-- src/
+|   +-- Data_Layer/
+|   |   +-- dataServices.js # In-memory user and message services
+|   +-- server.js           # Express application, routes, and HTTP server
++-- tests/
+|   +-- app.test.js         # Root and not-found route tests
+|   +-- concat.test.js      # Concatenation endpoint tests
+|   +-- sum.test.js         # Addition endpoint tests
++-- jest.config.js          # Test discovery and coverage configuration
++-- package.json            # Scripts and dependency ranges
++-- package-lock.json       # Exact dependency tree
++-- .gitignore              # Files excluded from version control
 ```
 
 ## Configuration notes
